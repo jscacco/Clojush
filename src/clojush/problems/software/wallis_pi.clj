@@ -179,3 +179,28 @@
    :error-threshold 0.001
    :max-error 1000000.0
    })
+
+(reset! global-evalpush-limit 8000)
+
+(reset! global-max-points 2400)
+
+(defn test-program-on-training
+  [program print-outputs]
+  ((make-wallis-pi-error-function-from-cases (first wallis-pi-train-and-test-cases)
+                                                   (second wallis-pi-train-and-test-cases))
+   {:program program} :train print-outputs))
+
+(def jack-program '(in1 integer_dup 0 integer_gt exec_do*while
+                        (integer_dec integer_dup 2 integer_mod boolean_frominteger exec_if 
+                                     (integer_dup 3 integer_add float_frominteger 
+                                                  integer_dup 2 integer_add float_frominteger 
+                                                  float_div)
+                                     (integer_dup 2 integer_add float_frominteger 
+                                                  integer_dup 3 integer_add float_frominteger
+                                                  float_div)
+                                     integer_dup 0 integer_gt)
+                        float_stackdepth exec_do*times float_mult))
+
+
+(test-program-on-training jack-program false)
+

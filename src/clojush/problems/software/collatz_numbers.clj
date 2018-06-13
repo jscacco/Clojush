@@ -166,3 +166,51 @@
    :final-report-simplifications 5000
    :max-error 1000000
    })
+
+(reset! global-evalpush-limit 5000)
+
+(reset! global-max-points 600)
+
+(defn test-program-on-training
+  [program print-outputs]
+  ((make-collatz-numbers-error-function-from-cases (first collatz-numbers-train-and-test-cases)
+                                                   (second collatz-numbers-train-and-test-cases))
+   {:program program} :train print-outputs))
+
+;;; This program only works if evalpush-limit > 4000 (works at 5000)
+(def tom-program
+ '(
+    tag_exec_100
+    (
+      integer_dup
+      1 integer_gt
+      exec_if
+      (
+       float_inc integer_dup
+       2 integer_mod 0 integer_eq
+       exec_if ; condition for even/odd (first even, then odd)
+       ( ;even case
+         2 integer_div
+         )
+       ( ;odd case
+         3 integer_mult integer_inc
+         )
+       tagged_50
+       )
+      (
+        integer_fromfloat
+        )
+      )
+    in1 1.0
+    tagged_50
+    ))
+
+(def jack-program
+  '(in1 integer_dup 1 integer_eq boolean_not exec_while
+    (integer_dup 2 integer_mod boolean_frominteger exec_if 
+                     (integer_dup 3 integer_mult integer_inc) 
+                     (integer_dup 2 integer_div)
+                     integer_dup 1 integer_eq boolean_not)
+        integer_stackdepth))
+
+(test-program-on-training tom-program false)
