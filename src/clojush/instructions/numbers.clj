@@ -19,6 +19,7 @@
 
 (define-registered integer_add (with-meta (adder :integer) {:stack-types [:integer]}))
 (define-registered float_add (with-meta (adder :float) {:stack-types [:float]}))
+(define-registered index_add (with-meta (adder :index) {:stack-types [:index]}))
 
 (defn subtracter
   "Returns a function that pushes the difference of the top two items."
@@ -34,6 +35,7 @@
 
 (define-registered integer_sub (with-meta (subtracter :integer) {:stack-types [:integer]}))
 (define-registered float_sub (with-meta (subtracter :float) {:stack-types [:float]}))
+(define-registered index_sub (with-meta (subtracter :index) {:stack-types [:index]}))
 
 (defn multiplier
   "Returns a function that pushes the product of the top two items."
@@ -49,6 +51,7 @@
 
 (define-registered integer_mult (with-meta (multiplier :integer) {:stack-types [:integer]}))
 (define-registered float_mult (with-meta (multiplier :float) {:stack-types [:float]}))
+(define-registered index_mult (with-meta (multiplier :index) {:stack-types [:index]}))
 
 (defn divider
   "Returns a function that pushes the quotient of the top two items. Does
@@ -69,6 +72,7 @@
 
 (define-registered integer_div (with-meta (divider :integer) {:stack-types [:integer]}))
 (define-registered float_div (with-meta (divider :float) {:stack-types [:float]}))
+(define-registered index_div (with-meta (divider :index) {:stack-types [:index]}))
 
 (defn modder
   "Returns a function that pushes the modulus of the top two items. Does
@@ -89,6 +93,7 @@
 
 (define-registered integer_mod (with-meta (modder :integer) {:stack-types [:integer]}))
 (define-registered float_mod (with-meta (modder :float) {:stack-types [:float]}))
+(define-registered index_mod (with-meta (modder :index) {:stack-types [:index]}))
 
 (defn comparer
   "Returns a function that pushes the result of comparator of the top two items
@@ -111,6 +116,10 @@
 (define-registered float_lte (with-meta (comparer :float <=) {:stack-types [:float :boolean]}))
 (define-registered float_gt (with-meta (comparer :float >) {:stack-types [:float :boolean]}))
 (define-registered float_gte (with-meta (comparer :float >=) {:stack-types [:float :boolean]}))
+(define-registered index_lt (with-meta (comparer :index <) {:stack-types [:index :boolean]}))
+(define-registered index_lte (with-meta (comparer :index <=) {:stack-types [:index :boolean]}))
+(define-registered index_gt (with-meta (comparer :index >) {:stack-types [:index :boolean]}))
+(define-registered index_gte (with-meta (comparer :index >=) {:stack-types [:index :boolean]}))
 
 (define-registered
   integer_fromboolean
@@ -133,6 +142,16 @@
       state)))
 
 (define-registered
+  index_fromboolean
+  ^{:stack-types [:index :boolean]}
+  (fn [state]
+    (if (not (empty? (:boolean state)))
+      (let [item (stack-ref :boolean 0 state)]
+        (->> (pop-item :boolean state)
+             (push-item (if item 1 0) :index)))
+      state)))
+
+(define-registered
   integer_fromfloat
   ^{:stack-types [:integer :float]}
   (fn [state]
@@ -143,6 +162,16 @@
       state)))
 
 (define-registered
+  index_fromfloat
+  ^{:stack-types [:index :float]}
+  (fn [state]
+    (if (not (empty? (:float state)))
+      (let [item (stack-ref :float 0 state)]
+        (->> (pop-item :float state)
+             (push-item (truncate item) :index)))
+      state)))
+
+(define-registered
   float_frominteger
   ^{:stack-types [:integer :float]}
   (fn [state]
@@ -150,6 +179,36 @@
       (let [item (stack-ref :integer 0 state)]
         (->> (pop-item :integer state)
              (push-item (*' 1.0 item) :float)))
+      state)))
+
+(define-registered
+  index_frominteger
+  ^{:stack-types [:integer :index]}
+  (fn [state]
+    (if (not (empty? (:integer state)))
+      (let [item (stack-ref :integer 0 state)]
+        (->> (pop-item :integer state)
+             (push-item (*' 1.0 item) :index)))
+      state)))
+
+(define-registered
+  integer_fromindex
+  ^{:stack-types [:index :float]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (let [item (stack-ref :index 0 state)]
+        (->> (pop-item :index state)
+             (push-item (truncate item) :integer)))
+      state)))
+
+(define-registered
+  float_fromindex
+  ^{:stack-types [:index :float]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (let [item (stack-ref :index 0 state)]
+        (->> (pop-item :index state)
+             (push-item (truncate item) :float)))
       state)))
 
 (define-registered
@@ -175,6 +234,17 @@
       state)))
 
 (define-registered
+  index_fromstring
+  ^{:stack-types [:index :string]}
+  (fn [state]
+    (if (not (empty? (:string state)))
+      (try (pop-item :string
+                     (push-item (keep-number-reasonable (Long/parseLong (top-item :string state)))
+                                :index state))
+        (catch Exception e state))
+      state)))
+
+(define-registered
   integer_fromchar
   ^{:stack-types [:integer :char]}
   (fn [state]
@@ -194,6 +264,16 @@
              (push-item (float (int item)) :float)))
       state)))
 
+(define-registered
+  index_fromchar
+  ^{:stack-types [:index :char]}
+  (fn [state]
+    (if (not (empty? (:char state)))
+      (let [item (stack-ref :char 0 state)]
+        (->> (pop-item :char state)
+             (push-item (int item) :index)))
+      state)))
+
 (defn minner
   "Returns a function that pushes the minimum of the top two items."
   [type]
@@ -208,6 +288,7 @@
 
 (define-registered integer_min (with-meta (minner :integer) {:stack-types [:integer]}))
 (define-registered float_min (with-meta (minner :float) {:stack-types [:float]}))
+(define-registered index_min (with-meta (minner :index) {:stack-types [:index]}))
 
 (defn maxer
   "Returns a function that pushes the maximum of the top two items."
@@ -223,6 +304,7 @@
 
 (define-registered integer_max (with-meta (maxer :integer) {:stack-types [:integer]}))
 (define-registered float_max (with-meta (maxer :float) {:stack-types [:float]}))
+(define-registered index_max (with-meta (maxer :index) {:stack-types [:index]}))
 
 (define-registered
   float_sin
@@ -292,4 +374,24 @@
       (push-item (keep-number-reasonable (dec (stack-ref :float 0 state)))
                  :float
                  (pop-item :float state))
+      state)))
+
+(define-registered
+  index_inc
+  ^{:stack-types [:index]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (push-item (keep-number-reasonable (inc (stack-ref :index 0 state)))
+                 :index
+                 (pop-item :index state))
+      state)))
+
+(define-registered
+  index_dec
+  ^{:stack-types [:index]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (push-item (keep-number-reasonable (dec (stack-ref :index 0 state)))
+                 :index
+                 (pop-item :index state))
       state)))
