@@ -17,6 +17,9 @@
     state
     (let [literal-type (recognize-literal instruction)]
       (cond
+        ; For index literals
+        (= literal-type :index)
+        (push-item (:index instruction) :index state)
         ;
         literal-type 
         (push-item instruction literal-type state)

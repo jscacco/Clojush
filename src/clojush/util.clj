@@ -12,6 +12,7 @@
   (atom
     {:integer integer?
      :float float?
+     :index (fn [thing] (and (map? thing) (:index thing))) ; We represent index literals as maps with an index key
      :char char?
      :string string?
      :boolean (fn [thing] (or (= thing true) (= thing false)))
@@ -21,7 +22,7 @@
      :vector_boolean (fn [thing] (and (vector? thing) (or (= (first thing) true) (= (first thing) false))))}))
      
 (defn recognize-literal
-  "If thing is a literal, return its type -- otherwise return false."
+  "If thing is a literal, return its type -- otherwise return nil."
   [thing]
   (loop [m (seq @literals)]
     (if-let [[type pred] (first m)]

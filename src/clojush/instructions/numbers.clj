@@ -193,7 +193,7 @@
 
 (define-registered
   integer_fromindex
-  ^{:stack-types [:index :float]}
+  ^{:stack-types [:index :integer]}
   (fn [state]
     (if (not (empty? (:index state)))
       (let [item (stack-ref :index 0 state)]

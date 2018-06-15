@@ -8,7 +8,7 @@
 ;; see the definition of push-argmap in args.clj for more information on these.
 
 
-(def push-types '(:exec :code :integer :float :boolean :char :string :zip
+(def push-types '(:exec :code :integer :float :index :boolean :char :string :zip
                   :vector_integer :vector_float :vector_boolean :vector_string
                   :input :output :auxiliary :tag :return :environment :genome))
 ;; The list of stacks used by the Push interpreter
