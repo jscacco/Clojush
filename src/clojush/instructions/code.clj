@@ -95,112 +95,112 @@
 
 (define-registered 
   code_do*range
-  ^{:stack-types [:code :exec :integer]}
+  ^{:stack-types [:code :exec :index]}
   (fn [state]
     (if (not (or (empty? (:code state))
-                 (empty? (rest (:integer state)))))
+                 (empty? (rest (:index state)))))
       (let [to-do (first (:code state))
-            current-index (first (rest (:integer state)))
-            destination-index (first (:integer state))
-            args-popped (pop-item :integer
-                                  (pop-item :integer
+            current-index (first (rest (:index state)))
+            destination-index (first (:index state))
+            args-popped (pop-item :index
+                                  (pop-item :index
                                             (pop-item :code state)))
             increment (cond (< current-index destination-index) 1
                             (> current-index destination-index) -1
                             true 0)
             continuation (if (zero? increment)
                            args-popped
-                           (push-item (list (+' current-index increment)
-                                            destination-index
+                           (push-item (list {:index (+' current-index increment)}
+                                            {:index destination-index}
                                             'code_quote
                                             to-do
                                             'code_do*range)
                                       :exec
                                       args-popped))]
-        (push-item to-do :exec (push-item current-index :integer continuation)))
+        (push-item to-do :exec (push-item current-index :index continuation)))
       state)))
 
 (define-registered 
   exec_do*range
-  ^{:stack-types [:exec :integer]
+  ^{:stack-types [:exec :index]
     :parentheses 1}
   (fn [state] ; Differs from code.do*range only in the source of the code and the recursive call.
     (if (not (or (empty? (:exec state))
-                 (empty? (rest (:integer state)))))
+                 (empty? (rest (:index state)))))
       (let [to-do (first (:exec state))
-            current-index (first (rest (:integer state)))
-            destination-index (first (:integer state))
-            args-popped (pop-item :integer
-                                  (pop-item :integer
+            current-index (first (rest (:index state)))
+            destination-index (first (:index state))
+            args-popped (pop-item :index
+                                  (pop-item :index
                                             (pop-item :exec state)))
             increment (cond (< current-index destination-index) 1
                             (> current-index destination-index) -1
                             true 0)
             continuation (if (zero? increment)
                            args-popped
-                           (push-item (list (+' current-index increment)
-                                            destination-index
+                           (push-item (list {:index (+' current-index increment)}
+                                            {:index destination-index}
                                             'exec_do*range
                                             to-do)
                                       :exec
                                       args-popped))]
-        (push-item to-do :exec (push-item current-index :integer continuation)))
+        (push-item to-do :exec (push-item current-index :index continuation)))
       state)))
 
 (define-registered 
   code_do*count
-  ^{:stack-types [:code :exec :integer]}
+  ^{:stack-types [:code :exec :index]}
   (fn [state]
-    (if (not (or (empty? (:integer state))
-                 (< (first (:integer state)) 1)
+    (if (not (or (empty? (:index state))
+                 (< (first (:index state)) 1)
                  (empty? (:code state))))
-      (push-item (list 0 (dec (first (:integer state))) 
+      (push-item (list {:index 0} {:index (dec (first (:index state)))}
                        'code_quote (first (:code state)) 'code_do*range)
                  :exec
-                 (pop-item :integer (pop-item :code state)))
+                 (pop-item :index (pop-item :code state)))
       state)))
 
 (define-registered
   exec_do*count
-  ^{:stack-types [:exec :integer]
+  ^{:stack-types [:exec :index]
     :parentheses 1}
   ;; differs from code.do*count only in the source of the code and the recursive call    
   (fn [state] 
-    (if (not (or (empty? (:integer state))
-                 (< (first (:integer state)) 1)
+    (if (not (or (empty? (:index state))
+                 (< (first (:index state)) 1)
                  (empty? (:exec state))))
-      (push-item (list 0 (dec (first (:integer state))) 'exec_do*range (first (:exec state)))
+      (push-item (list {:index 0} {:index (dec (first (:index state)))} 'exec_do*range (first (:exec state)))
                  :exec
-                 (pop-item :integer (pop-item :exec state)))
+                 (pop-item :index (pop-item :exec state)))
       state)))
 
 (define-registered
   code_do*times
-  ^{:stack-types [:code :exec :integer]}
+  ^{:stack-types [:code :exec :index]}
   (fn [state]
-    (if (not (or (empty? (:integer state))
-                 (< (first (:integer state)) 1)
+    (if (not (or (empty? (:index state))
+                 (< (first (:index state)) 1)
                  (empty? (:code state))))
-      (push-item (list 0 (dec (first (:integer state))) 'code_quote 
-                       (cons 'integer_pop 
+      (push-item (list {:index 0} {:index (dec (first (:index state)))} 'code_quote 
+                       (cons 'index_pop 
                              (ensure-list (first (:code state)))) 'code_do*range)
                  :exec
-                 (pop-item :integer (pop-item :code state)))
+                 (pop-item :index (pop-item :code state)))
       state)))
 
 (define-registered
   exec_do*times
-  ^{:stack-types [:exec :integer]
+  ^{:stack-types [:exec :index]
     :parentheses 1}
   ;; differs from code.do*times only in the source of the code and the recursive call
   (fn [state]
-    (if (not (or (empty? (:integer state))
-                 (< (first (:integer state)) 1)
+    (if (not (or (empty? (:index state))
+                 (< (first (:index state)) 1)
                  (empty? (:exec state))))
-      (push-item (list 0 (dec (first (:integer state))) 'exec_do*range
-                       (cons 'integer_pop (ensure-list (first (:exec state)))))
+      (push-item (list {:index 0} {:index (dec (first (:index state)))} 'exec_do*range
+                       (cons 'index_pop (ensure-list (first (:exec state)))))
                  :exec
-                 (pop-item :integer (pop-item :exec state)))
+                 (pop-item :index (pop-item :exec state)))
       state)))
 
 (define-registered

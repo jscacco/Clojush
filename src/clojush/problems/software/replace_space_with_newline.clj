@@ -36,7 +36,7 @@
             ;;; end constants
             (fn [] (lrand-nth (concat [\newline \tab] (map char (range 32 127))))) ;Visible character ERC
             (fn [] (replace-space-with-newline-input (lrand-int 21))) ;String ERC
-            (fn [] {:index (lrand-int -100 100)}) ; Index ERC
+            (fn [] {:index (lrand-int 100)}) ; Index ERC
             ;;; end ERCs
             (tag-instruction-erc [:exec :integer :boolean :string :char] 1000)
             (tagged-instruction-erc 1000)

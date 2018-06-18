@@ -188,7 +188,7 @@
     (if (not (empty? (:integer state)))
       (let [item (stack-ref :integer 0 state)]
         (->> (pop-item :integer state)
-             (push-item (*' 1.0 item) :index)))
+             (push-item item :index)))
       state)))
 
 (define-registered
@@ -198,7 +198,7 @@
     (if (not (empty? (:index state)))
       (let [item (stack-ref :index 0 state)]
         (->> (pop-item :index state)
-             (push-item (truncate item) :integer)))
+             (push-item item :integer)))
       state)))
 
 (define-registered
