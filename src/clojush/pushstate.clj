@@ -39,7 +39,7 @@
   "Add the provided name to the global list of registered instructions."
   [name]
   (if (some #{name} @registered-instructions)
-    (throw (Exception. (str "Duplicate Push instruction defined:" name)))
+    ;(throw (Exception. (str "Duplicate Push instruction defined:" name)))
     (swap! registered-instructions conj name)))
 
 (def instruction-table (atom (hash-map)))

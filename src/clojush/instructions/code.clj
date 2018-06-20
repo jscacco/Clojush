@@ -95,7 +95,7 @@
 
 (define-registered 
   code_do*range
-  ^{:stack-types [:code :exec :index]}
+  ^{:stack-types [:code :exec :index :integer]}
   (fn [state]
     (if (not (or (empty? (:code state))
                  (empty? (rest (:index state)))))
@@ -117,12 +117,12 @@
                                             'code_do*range)
                                       :exec
                                       args-popped))]
-        (push-item to-do :exec (push-item current-index :index continuation)))
+        (push-item to-do :exec (push-item current-index :integer continuation)))
       state)))
 
 (define-registered 
   exec_do*range
-  ^{:stack-types [:exec :index]
+  ^{:stack-types [:exec :index :integer]
     :parentheses 1}
   (fn [state] ; Differs from code.do*range only in the source of the code and the recursive call.
     (if (not (or (empty? (:exec state))
@@ -144,7 +144,7 @@
                                             to-do)
                                       :exec
                                       args-popped))]
-        (push-item to-do :exec (push-item current-index :index continuation)))
+        (push-item to-do :exec (push-item current-index :integer continuation)))
       state)))
 
 (define-registered 
