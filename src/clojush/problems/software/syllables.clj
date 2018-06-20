@@ -50,7 +50,7 @@
             'in1
             ;;; end input instructions
             )
-          (registered-for-stacks [:integer :boolean :string :char :exec :print])))
+          (registered-for-stacks [:integer :boolean :string :char :exec :print :index])))
 
 
 ;; A list of data domains for the problem. Each domain is a vector containing
