@@ -77,28 +77,28 @@
 
 (define-registered
   string_take
-  ^{:stack-types [:string :integer]}
+  ^{:stack-types [:string :index]}
   (fn [state]
     (if (and (not (empty? (:string state)))
-             (not (empty? (:integer state))))
-      (push-item (apply str (take (stack-ref :integer 0 state)
+             (not (empty? (:index state))))
+      (push-item (apply str (take (stack-ref :index 0 state)
                                   (stack-ref :string 0 state)))
                  :string
-                 (pop-item :string (pop-item :integer state)))
+                 (pop-item :string (pop-item :index state)))
       state)))
 
 (define-registered
   string_substring
-  ^{:stack-types [:string :integer]}
+  ^{:stack-types [:string :index]}
   (fn [state]
     (if (and (not (empty? (:string state)))
-             (not (empty? (rest (:integer state)))))
+             (not (empty? (rest (:index state)))))
       (let [st (stack-ref :string 0 state)
-            first-index (min (count st) (max 0 (stack-ref :integer 1 state)))
-            second-index (min (count st) (max first-index (stack-ref :integer 0 state)))]
+            first-index (min (count st) (max 0 (stack-ref :index 1 state)))
+            second-index (min (count st) (max first-index (stack-ref :index 0 state)))]
         (push-item (subs st first-index second-index)
                    :string
-                   (pop-item :string (pop-item :integer (pop-item :integer state)))))
+                   (pop-item :string (pop-item :index (pop-item :index state)))))
       state)))
 
 (define-registered
@@ -125,16 +125,16 @@
 
 (define-registered
   string_nth
-  ^{:stack-types [:string :char :integer]}
+  ^{:stack-types [:string :char :index]}
   (fn [state]
     (if (and (not (empty? (:string state)))
-             (not (empty? (:integer state)))
+             (not (empty? (:index state)))
              (not (empty? (first (:string state)))))
       (let [st (stack-ref :string 0 state)
-            index (mod (stack-ref :integer 0 state) (count st))]
+            index (mod (stack-ref :index 0 state) (count st))]
         (push-item (nth st index)
                    :char
-                   (pop-item :integer (pop-item :string state))))
+                   (pop-item :index (pop-item :string state))))
       state)))
 
 (define-registered
@@ -245,8 +245,8 @@
                    (pop-item :char (pop-item :string state)))))))
 
 (define-registered
-  string_indexofchar ; puts on the integer stack the index of the top char in the top string
-  ^{:stack-types [:string :integer :char]}
+  string_indexofchar ; puts on the index stack the index of the top char in the top string
+  ^{:stack-types [:string :index :char]}
   (fn [state]
     (if (or (empty? (:string state))
             (empty? (:char state)))
@@ -254,8 +254,8 @@
       (let [sub (str (top-item :char state))
             full (stack-ref :string 0 state)
             index (.indexOf full sub)]
-        (push-item index
-                   :integer
+        (push-item {:index index}
+                   :index
                    (pop-item :char (pop-item :string state)))))))
 
 (define-registered
@@ -349,23 +349,23 @@
 
 (define-registered
   string_setchar ; Returns a function that sets char at index in string
-  ^{:stack-types [:string :char :integer]}
+  ^{:stack-types [:string :char :index]}
   (fn [state]
     (if (or (empty? (:string state))
             (empty? (:char state))
-            (empty? (:integer state)))
+            (empty? (:index state)))
       state
       (let [s (top-item :string state)
             item (top-item :char state)
             index (if (empty? s)
                     0
-                    (mod (top-item :integer state) (count s)))
+                    (mod (top-item :index state) (count s)))
             result (if (empty? s)
                      s
                      (apply str (assoc (vec s) index item)))]
         (push-item result
                    :string
-                   (pop-item :char (pop-item :integer (pop-item :string state))))))))
+                   (pop-item :char (pop-item :index (pop-item :string state))))))))
 
 (define-registered
   exec_string_iterate ; Returns a function that iterates over a string using the code on the exec stack.

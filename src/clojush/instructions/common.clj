@@ -57,30 +57,30 @@
    global-max-points."
   [type]
   (fn [state]
-    (if (or (and (= type :integer)
-                 (>= (count (:integer state)) 2))
-            (and (not (= type :integer))
+    (if (or (and (= type :index)
+                 (>= (count (:index state)) 2))
+            (and (not (= type :index))
                  (not (empty? (type state)))
-                 (not (empty? (:integer state)))))
-      (let [times-duplicated (min (top-item :integer state)
-                                  (- @global-max-points (count (rest (type (pop-item :integer state))))))
+                 (not (empty? (:index state)))))
+      (let [times-duplicated (min (top-item :index state)
+                                  (- @global-max-points (count (rest (type (pop-item :index state))))))
             new-type-stack (not-lazy (concat (repeat times-duplicated
-                                                     (top-item type (pop-item :integer state)))
-                                             (rest (type (pop-item :integer state)))))]
-        (assoc (pop-item :integer state)
+                                                     (top-item type (pop-item :index state)))
+                                             (rest (type (pop-item :index state)))))]
+        (assoc {:index (pop-item :index state)}
                type
                new-type-stack))
       state)))
 
-(define-registered exec_dup_times (with-meta (dup-timeser :exec) {:stack-types [:exec :integer] :parentheses 1}))
-(define-registered integer_dup_times (with-meta (dup-timeser :integer) {:stack-types [:integer]}))
-(define-registered float_dup_times (with-meta (dup-timeser :float) {:stack-types [:float :integer]}))
-(define-registered index_dup_times (with-meta (dup-timeser :index) {:stack-types [:index :integer]}))
-(define-registered code_dup_times (with-meta (dup-timeser :code) {:stack-types [:code :integer]}))
-(define-registered boolean_dup_times (with-meta (dup-timeser :boolean) {:stack-types [:boolean :integer]}))
-(define-registered zip_dup_times (with-meta (dup-timeser :zip) {:stack-types [:zip :integer]}))
-(define-registered string_dup_times (with-meta (dup-timeser :string) {:stack-types [:string :integer]}))
-(define-registered char_dup_times (with-meta (dup-timeser :char) {:stack-types [:char :integer]}))
+(define-registered exec_dup_times (with-meta (dup-timeser :exec) {:stack-types [:exec :index] :parentheses 1}))
+(define-registered integer_dup_times (with-meta (dup-timeser :integer) {:stack-types [:integer :index]}))
+(define-registered float_dup_times (with-meta (dup-timeser :float) {:stack-types [:float :index]}))
+(define-registered index_dup_times (with-meta (dup-timeser :index) {:stack-types [:index]}))
+(define-registered code_dup_times (with-meta (dup-timeser :code) {:stack-types [:code :index]}))
+(define-registered boolean_dup_times (with-meta (dup-timeser :boolean) {:stack-types [:boolean :index]}))
+(define-registered zip_dup_times (with-meta (dup-timeser :zip) {:stack-types [:zip :index]}))
+(define-registered string_dup_times (with-meta (dup-timeser :string) {:stack-types [:string :index]}))
+(define-registered char_dup_times (with-meta (dup-timeser :char) {:stack-types [:char :index]}))
 
 (defn dup-itemser
   "For integer argument n, duplicate the top n items on the stack one time each.
@@ -91,26 +91,26 @@
           (5.0 4.0 3.0 5.0 4.0 3.0 2.0 1.0) on the float stack"
   [type]
   (fn [state]
-    (if (empty? (:integer state))
+    (if (empty? (:index state))
       state
-      (let [items-to-duplicate (min (top-item :integer state)
-                                    (- @global-max-points (count (type (pop-item :integer state)))))
+      (let [items-to-duplicate (min (top-item :index state)
+                                    (- @global-max-points (count (type (pop-item :index state)))))
             new-type-stack (not-lazy (concat (take items-to-duplicate
-                                             (type (pop-item :integer state)))
-                                     (type (pop-item :integer state))))]
-        (assoc (pop-item :integer state)
+                                             (type (pop-item :index state)))
+                                     (type (pop-item :index state))))]
+        (assoc {:index (pop-item :index state)}
                type
                new-type-stack)))))
 
-(define-registered exec_dup_items (with-meta (dup-itemser :exec) {:stack-types [:exec :integer] :parentheses 0}))
-(define-registered integer_dup_items (with-meta (dup-itemser :integer) {:stack-types [:integer]}))
-(define-registered float_dup_items (with-meta (dup-itemser :float) {:stack-types [:float :integer]}))
-(define-registered index_dup_items (with-meta (dup-itemser :index) {:stack-types [:index :integer]}))
-(define-registered code_dup_items (with-meta (dup-itemser :code) {:stack-types [:code :integer]}))
-(define-registered zip_dup_items (with-meta (dup-itemser :zip) {:stack-types [:zip :integer]}))
-(define-registered boolean_dup_items (with-meta (dup-itemser :boolean) {:stack-types [:boolean :integer]}))
-(define-registered string_dup_items (with-meta (dup-itemser :string) {:stack-types [:string :integer]}))
-(define-registered char_dup_items (with-meta (dup-itemser :char) {:stack-types [:char :integer]}))
+(define-registered exec_dup_items (with-meta (dup-itemser :exec) {:stack-types [:exec :index] :parentheses 0}))
+(define-registered integer_dup_items (with-meta (dup-itemser :integer) {:stack-types [:integer :index]}))
+(define-registered float_dup_items (with-meta (dup-itemser :float) {:stack-types [:float :index]}))
+(define-registered index_dup_items (with-meta (dup-itemser :index) {:stack-types [:index]}))
+(define-registered code_dup_items (with-meta (dup-itemser :code) {:stack-types [:code :index]}))
+(define-registered zip_dup_items (with-meta (dup-itemser :zip) {:stack-types [:zip :index]}))
+(define-registered boolean_dup_items (with-meta (dup-itemser :boolean) {:stack-types [:boolean :index]}))
+(define-registered string_dup_items (with-meta (dup-itemser :string) {:stack-types [:string :index]}))
+(define-registered char_dup_items (with-meta (dup-itemser :char) {:stack-types [:char :index]}))
 
 (defn swapper
   "Returns a function that takes a state and swaps the top 2 items of the appropriate 
@@ -221,16 +221,16 @@
 
 (defn yanker
   "Returns a function that yanks an item from deep in the specified stack,
-   using the top integer to indicate how deep."
+   using the top index to indicate how deep."
   [type]
   (fn [state]
-    (if (or (and (= type :integer)
+    (if (or (and (= type :index)
                  (not (empty? (rest (type state)))))
-            (and (not (= type :integer))
+            (and (not (= type :index))
                  (not (empty? (type state)))
-                 (not (empty? (:integer state)))))
-      (let [raw-index (stack-ref :integer 0 state)
-            with-index-popped (pop-item :integer state)
+                 (not (empty? (:index state)))))
+      (let [raw-index (stack-ref :index 0 state)
+            with-index-popped (pop-item :index state)
             actual-index (max 0 (min raw-index (- (count (type with-index-popped)) 1)))
             item (stack-ref type actual-index with-index-popped)
             with-item-pulled (assoc with-index-popped 
@@ -241,15 +241,15 @@
         (push-item item type with-item-pulled))
       state)))
 
-(define-registered exec_yank (with-meta (yanker :exec) {:stack-types [:exec :integer] :parentheses 0}))
-(define-registered integer_yank (with-meta (yanker :integer) {:stack-types [:integer]}))
-(define-registered float_yank (with-meta (yanker :float) {:stack-types [:float :integer]}))
-(define-registered index_yank (with-meta (yanker :index) {:stack-types [:index :integer]}))
-(define-registered code_yank (with-meta (yanker :code) {:stack-types [:code :integer]}))
-(define-registered boolean_yank (with-meta (yanker :boolean) {:stack-types [:boolean :integer]}))
-(define-registered zip_yank (with-meta (yanker :zip) {:stack-types [:zip :integer]}))
-(define-registered string_yank (with-meta (yanker :string) {:stack-types [:string :integer]}))
-(define-registered char_yank (with-meta (yanker :char) {:stack-types [:char :integer]}))
+(define-registered exec_yank (with-meta (yanker :exec) {:stack-types [:exec :index] :parentheses 0}))
+(define-registered integer_yank (with-meta (yanker :integer) {:stack-types [:index :integer]}))
+(define-registered float_yank (with-meta (yanker :float) {:stack-types [:float :index]}))
+(define-registered index_yank (with-meta (yanker :index) {:stack-types [:index]}))
+(define-registered code_yank (with-meta (yanker :code) {:stack-types [:code :index]}))
+(define-registered boolean_yank (with-meta (yanker :boolean) {:stack-types [:boolean :index]}))
+(define-registered zip_yank (with-meta (yanker :zip) {:stack-types [:zip :index]}))
+(define-registered string_yank (with-meta (yanker :string) {:stack-types [:string :index]}))
+(define-registered char_yank (with-meta (yanker :char) {:stack-types [:char :index]}))
 
 (defn yankduper
   "Returns a function that yanks a copy of an item from deep in the specified stack,
@@ -280,16 +280,16 @@
 
 (defn shover
   "Returns a function that shoves an item deep in the specified stack, using the top
-   integer to indicate how deep."
+   index to indicate how deep."
   [type]
   (fn [state]
-    (if (or (and (= type :integer)
+    (if (or (and (= type :index)
                  (not (empty? (rest (type state)))))
-            (and (not (= type :integer))
+            (and (not (= type :index))
                  (not (empty? (type state)))
-                 (not (empty? (:integer state)))))
-      (let [raw-index (stack-ref :integer 0 state)
-            with-index-popped (pop-item :integer state)
+                 (not (empty? (:index state)))))
+      (let [raw-index (stack-ref :index 0 state)
+            with-index-popped (pop-item :index state)
             item (top-item type with-index-popped)
             with-args-popped (pop-item type with-index-popped)
             actual-index (max 0 (min raw-index (count (type with-args-popped))))]
@@ -300,15 +300,15 @@
                                                  (drop actual-index stk))))))
       state)))
 
-(define-registered exec_shove (with-meta (shover :exec) {:stack-types [:exec :integer] :parentheses 1}))
-(define-registered integer_shove (with-meta (shover :integer) {:stack-types [:integer]}))
-(define-registered float_shove (with-meta (shover :float) {:stack-types [:float :integer]}))
-(define-registered index_shove (with-meta (shover :index) {:stack-types [:float :index]}))
-(define-registered code_shove (with-meta (shover :code) {:stack-types [:code :integer]}))
-(define-registered boolean_shove (with-meta (shover :boolean) {:stack-types [:boolean :integer]}))
-(define-registered zip_shove (with-meta (shover :zip) {:stack-types [:zip :integer]}))
-(define-registered string_shove (with-meta (shover :string) {:stack-types [:string :integer]}))
-(define-registered char_shove (with-meta (shover :char) {:stack-types [:char :integer]}))
+(define-registered exec_shove (with-meta (shover :exec) {:stack-types [:exec :index] :parentheses 1}))
+(define-registered integer_shove (with-meta (shover :integer) {:stack-types [:integer :index]}))
+(define-registered float_shove (with-meta (shover :float) {:stack-types [:float :index]}))
+(define-registered index_shove (with-meta (shover :index) {:stack-types [:index]}))
+(define-registered code_shove (with-meta (shover :code) {:stack-types [:code :index]}))
+(define-registered boolean_shove (with-meta (shover :boolean) {:stack-types [:boolean :index]}))
+(define-registered zip_shove (with-meta (shover :zip) {:stack-types [:zip :index]}))
+(define-registered string_shove (with-meta (shover :string) {:stack-types [:string :index]}))
+(define-registered char_shove (with-meta (shover :char) {:stack-types [:char :index]}))
 
 (defn emptyer
   "Returns a function that takes a state and tells whether that stack is empty."

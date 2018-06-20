@@ -351,30 +351,30 @@
 
 (define-registered 
   code_nth
-  ^{:stack-types [:code :integer]}
+  ^{:stack-types [:code :index]}
   (fn [state]
-    (if (not (or (empty? (:integer state))
+    (if (not (or (empty? (:index state))
                  (empty? (:code state))
                  (empty? (ensure-list (first (:code state))))))
       (push-item (nth (ensure-list (first (:code state)))
-                      (mod (math/abs (first (:integer state)))
+                      (mod (math/abs (first (:index state)))
                            (count (ensure-list (first (:code state))))))
                  :code
-                 (pop-item :integer (pop-item :code state)))
+                 (pop-item :index (pop-item :code state)))
       state)))
 
 (define-registered 
   code_nthcdr
-  ^{:stack-types [:code :integer]}
+  ^{:stack-types [:code :index]}
   (fn [state]
-    (if (not (or (empty? (:integer state))
+    (if (not (or (empty? (:index state))
                  (empty? (:code state))
                  (empty? (ensure-list (first (:code state))))))
-      (push-item (drop (mod (math/abs (first (:integer state))) 
+      (push-item (drop (mod (math/abs (first (:index state))) 
                             (count (ensure-list (first (:code state)))))
                        (ensure-list (first (:code state))))
                  :code
-                 (pop-item :integer (pop-item :code state)))
+                 (pop-item :index (pop-item :code state)))
       state)))
 
 (define-registered 
@@ -400,29 +400,29 @@
 
 (define-registered 
   code_extract
-  ^{:stack-types [:code :integer]}
+  ^{:stack-types [:code :index]}
   (fn [state]
     (if (not (or (empty? (:code state))
-                 (empty? (:integer state))))
+                 (empty? (:index state))))
       (push-item (code-at-point (first (:code state))
-                                (first (:integer state)))
+                                (first (:index state)))
                  :code
-                 (pop-item :code (pop-item :integer state)))
+                 (pop-item :code (pop-item :index state)))
       state)))
 
 (define-registered 
   code_insert
-  ^{:stack-types [:code :integer]}
+  ^{:stack-types [:code :index]}
   (fn [state]
     (if (not (or (empty? (rest (:code state)))
-                 (empty? (:integer state))))
+                 (empty? (:index state))))
       (let [new-item (insert-code-at-point (first (:code state))
-                                           (first (:integer state))
+                                           (first (:index state))
                                            (second (:code state)))]
         (if (<= (count-points new-item) @global-max-points)
           (push-item new-item
                      :code
-                     (pop-item :code (pop-item :code (pop-item :integer state))))
+                     (pop-item :code (pop-item :code (pop-item :index state))))
           state))
       state)))
 
@@ -473,13 +473,13 @@
 
 (define-registered 
   code_position
-  ^{:stack-types [:code :integer]}
+  ^{:stack-types [:code :index]}
   (fn [state]
     (if (not (empty? (rest (:code state))))
       (push-item (or (first (positions #{(stack-ref :code 1 state)}
                                        (ensure-list (stack-ref :code 0 state))))
                      -1)
-                 :integer
+                 :index 
                  (pop-item :code (pop-item :code state)))
       state)))
 
