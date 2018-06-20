@@ -48,7 +48,7 @@
 
 
 ;; A list of data domains for the problem. Each domain is a vector containing
-;; a "set" of inputs and two integers represe(nting how many cases from the set
+;; a "set" of inputs and two integers representing how many cases from the set
 ;; should be used as training and testing cases respectively. Each "set" of
 ;; inputs is either a list or a function that, when called, will create a
 ;; random element of the set.
