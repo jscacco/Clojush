@@ -254,7 +254,7 @@
       (let [sub (str (top-item :char state))
             full (stack-ref :string 0 state)
             index (.indexOf full sub)]
-        (push-item {:index index}
+        (push-item index
                    :index
                    (pop-item :char (pop-item :string state)))))))
 
