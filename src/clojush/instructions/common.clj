@@ -67,7 +67,7 @@
             new-type-stack (not-lazy (concat (repeat times-duplicated
                                                      (top-item type (pop-item :index state)))
                                              (rest (type (pop-item :index state)))))]
-        (assoc {:index (pop-item :index state)}
+        (assoc (pop-item :index state)
                type
                new-type-stack))
       state)))
@@ -98,7 +98,7 @@
             new-type-stack (not-lazy (concat (take items-to-duplicate
                                              (type (pop-item :index state)))
                                      (type (pop-item :index state))))]
-        (assoc {:index (pop-item :index state)}
+        (assoc (pop-item :index state)
                type
                new-type-stack)))))
 

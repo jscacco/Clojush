@@ -41,7 +41,12 @@
         (handle-tag-code-macro instruction state)
         ;
         (contains? @instruction-table instruction) 
-        ((instruction @instruction-table) state)
+        (try
+          ((instruction @instruction-table) state)
+          (catch Exception e (do (println "Exception with instruction" instruction)
+                                 (println "STATE:")
+                                 (println state)
+                                 (throw (Exception. e)))))
         ;
         :else 
         (throw (Exception. (str "Undefined instruction: " (pr-str instruction))))))))
