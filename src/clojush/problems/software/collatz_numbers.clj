@@ -22,6 +22,7 @@
             1
             ;;; end constants
             (fn [] (- (lrand-int 201) 100)) ;Integer ERC [-100,100]
+            (fn [] {:index (- (lrand-int 201) 100}) ; Index ERC
             ;;; end ERCs
             (tag-instruction-erc [:integer :float :boolean :exec] 1000)
             (tagged-instruction-erc 1000)
@@ -29,7 +30,7 @@
             'in1
             ;;; end input instructions
             )
-          (registered-for-stacks [:integer :float :boolean :exec])))
+          (registered-for-stacks [:integer :float :boolean :exec :index])))
 
 
 ;; A list of data domains for the problem. Each domain is a vector containing

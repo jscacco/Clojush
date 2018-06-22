@@ -20,6 +20,7 @@
   (concat (list
             ^{:generator-label "Random numbers in the range [-50,50]"}
             (fn [] (- (lrand-int 101) 50))
+            (fn [] {:index (- (lrand-int 201) 100)}) ; Index ERC
             ;;; end ERCs
             (tag-instruction-erc [:integer :boolean :vector_integer :exec] 1000)
             (tagged-instruction-erc 1000)
@@ -27,7 +28,7 @@
             'in1
             ;;; end input instructions
             )
-          (registered-for-stacks [:integer :boolean :vector_integer :exec])))
+          (registered-for-stacks [:integer :boolean :vector_integer :exec :index])))
 
 ;; Define test cases
 (defn random-sequence-with-at-least-one-zero

@@ -159,11 +159,11 @@
 
 (define-registered
   string_length
-  ^{:stack-types [:string :integer]}
+  ^{:stack-types [:string :index]}
   (fn [state]
     (if (not (empty? (:string state)))
       (push-item (count (stack-ref :string 0 state))
-                 :integer
+                 :index
                  (pop-item :string state))
       state)))
 
@@ -260,7 +260,7 @@
 
 (define-registered
   string_occurrencesofchar ; the number of times the top char is in the top string
-  ^{:stack-types [:string :integer :char]}
+  ^{:stack-types [:string :index :char]}
   (fn [state]
     (if (or (empty? (:string state))
             (empty? (:char state)))
@@ -269,7 +269,7 @@
             st (stack-ref :string 0 state)
             occ (count (filter #{ch} st))]
         (push-item occ
-                   :integer
+                   :index
                    (pop-item :char (pop-item :string state)))))))
 
 (define-registered

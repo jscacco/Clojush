@@ -207,17 +207,17 @@
    given state."
   [type]
   (fn [state]
-    (push-item (count (type state)) :integer state)))
+    (push-item (count (type state)) :index state)))
 
-(define-registered exec_stackdepth (with-meta (stackdepther :exec) {:stack-types [:exec :integer]}))
-(define-registered integer_stackdepth (with-meta (stackdepther :integer) {:stack-types [:integer]}))
-(define-registered float_stackdepth (with-meta (stackdepther :float) {:stack-types [:float :integer]}))
-(define-registered index_stackdepth (with-meta (stackdepther :index) {:stack-types [:index :integer]}))
-(define-registered code_stackdepth (with-meta (stackdepther :code) {:stack-types [:code :integer]}))
-(define-registered boolean_stackdepth (with-meta (stackdepther :boolean) {:stack-types [:boolean :integer]}))
-(define-registered zip_stackdepth (with-meta (stackdepther :zip) {:stack-types [:zip :integer]}))
-(define-registered string_stackdepth (with-meta (stackdepther :string) {:stack-types [:string :integer]}))
-(define-registered char_stackdepth (with-meta (stackdepther :char) {:stack-types [:char :integer]}))
+(define-registered exec_stackdepth (with-meta (stackdepther :exec) {:stack-types [:exec :index]}))
+(define-registered integer_stackdepth (with-meta (stackdepther :integer) {:stack-types [:integer :index]}))
+(define-registered float_stackdepth (with-meta (stackdepther :float) {:stack-types [:float :index]}))
+(define-registered index_stackdepth (with-meta (stackdepther :index) {:stack-types [:index]}))
+(define-registered code_stackdepth (with-meta (stackdepther :code) {:stack-types [:code :index]}))
+(define-registered boolean_stackdepth (with-meta (stackdepther :boolean) {:stack-types [:boolean :index]}))
+(define-registered zip_stackdepth (with-meta (stackdepther :zip) {:stack-types [:zip :index]}))
+(define-registered string_stackdepth (with-meta (stackdepther :string) {:stack-types [:string :index]}))
+(define-registered char_stackdepth (with-meta (stackdepther :char) {:stack-types [:char :index]}))
 
 (defn yanker
   "Returns a function that yanks an item from deep in the specified stack,
