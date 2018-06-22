@@ -1,4 +1,4 @@
-#PBS -N index-v1-lioz
+#PBS -N index-v1-stringdiff
 #PBS -l nodes=1:ppn=8
 #PBS -l mem=20GB
 #PBS -q una
@@ -18,10 +18,9 @@
 NP=`cat $PBS_NODEFILE | wc -l`  # Bash syntax
 #setenv NP `cat $PBS_NODEFILE | wc -l` # tcsh/csh syntax
 
-
 #NAMESPACE="replace-space-with-newline"
 #NAMESPACE="collatz-numbers"
-NAMESPACE="last-index-of-zero"
+NAMESPACE="string-differences"
 
 # Results will go to our shared results directory (helmuth). You may have a symlink to this directory called Collab.
 # Make sure the correct subdirectory follows helmuth -- the first subdirectory should be

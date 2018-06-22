@@ -36,15 +36,16 @@
             \newline
             ;;; end constants
             (fn [] (- (lrand-int 21) 10)) ;; Integer ERC [-10,10]
+            (fn [] {:index (- (lrand-int 201) 100)}) ; Index ERC [-100, 100]
             ;;; end ERCs
-            (tag-instruction-erc [:integer :boolean :string :char :exec] 1000)
+            (tag-instruction-erc [:integer :boolean :string :char :exec :index] 1000)
             (tagged-instruction-erc 1000)
             ;;; end tag ERCs
             'in1
             'in2
             ;;; end input instructions
             )
-          (registered-for-stacks [:integer :boolean :string :char :exec :print])))
+          (registered-for-stacks [:integer :boolean :string :char :exec :print :index])))
 
 
 ;; Define test cases
