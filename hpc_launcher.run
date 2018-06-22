@@ -1,8 +1,8 @@
-#PBS -N Syll-tourney
+#PBS -N index-v1-stringdiff
 #PBS -l nodes=1:ppn=8
 #PBS -l mem=20GB
 #PBS -q una
-#PBS -M thelmuth@hamilton.edu
+#PBS -M jscacco@hamilton.edu
 #PBS -m n
 #PBS -j oe         
 #PBS -l walltime=72:00:00 
@@ -19,15 +19,13 @@ NP=`cat $PBS_NODEFILE | wc -l`  # Bash syntax
 #setenv NP `cat $PBS_NODEFILE | wc -l` # tcsh/csh syntax
 
 
-#NAMESPACE="replace-space-with-newline"
+NAMESPACE="string-differences"
 NAMESPACE="collatz-numbers"
 #NAMESPACE="last-index-of-zero"
 
-SELECTION="tournament"
+DIRECTORY="$PBS_O_HOME/Results/index-v1/$NAMESPACE"
 
-DIRECTORY="$PBS_O_HOME/Results/parent-selection-v2/$SELECTION/$NAMESPACE"
-
-PUSHARGS=":parent-selection :$SELECTION"
+PUSHARGS=":parent-selection :$SELECTION :print-instruction-frequencies"
 
 PROBLEM="clojush.problems.software.$NAMESPACE"
 
