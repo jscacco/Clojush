@@ -20,8 +20,8 @@ NP=`cat $PBS_NODEFILE | wc -l`  # Bash syntax
 
 
 #NAMESPACE="replace-space-with-newline"
-NAMESPACE="syllables"
-#NAMESPACE="vector-average"
+NAMESPACE="collatz-numbers"
+#NAMESPACE="last-index-of-zero"
 
 SELECTION="tournament"
 

@@ -302,6 +302,7 @@
            parent-selection print-homology-data max-point-evaluations
            print-error-frequencies-by-case normalization autoconstructive
            print-selection-counts exit-on-success
+           print-instruction-frequencies
            ;; The following are for CSV or JSON logs
            print-csv-logs print-json-logs csv-log-filename json-log-filename
            log-fitnesses-for-all-cases json-log-program-strings
@@ -392,6 +393,9 @@
               (double (/ (count-parens (:program best))
                          (count-points (:program best)))))) ;Number of (open) parens / points
     (println "--- Population Statistics ---")
+    (when print-instruction-frequencies
+      (println "Instruction frequencies:"
+               (apply merge-with + (map #(frequencies (flatten (:program %))) population))))
     (when print-cosmos-data
       (println "Cosmos Data:" (let [quants (config/quantiles (count population))]
                                 (zipmap quants 

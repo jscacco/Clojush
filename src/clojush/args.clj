@@ -471,6 +471,9 @@
           :exit-on-success true
           ;; When true, will exit the run when there is an individual with a zero-error vector
 
+          :print-instruction-frequencies false
+          ;; When true, prints a map containing the frequency of each instruction used in the generation
+
           ;;----------------------------------------
           ;; Arguments related to printing JSON, EDN, CSV, and remote recording
           ;;----------------------------------------
