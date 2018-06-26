@@ -22,7 +22,7 @@
             1
             ;;; end constants
             (fn [] (- (lrand-int 201) 100)) ;Integer ERC [-100,100]
-            (fn [] {:index (- (lrand-int 201) 100}) ; Index ERC
+            (fn [] {:index (- (lrand-int 201) 100)}) ; Index ERC
             ;;; end ERCs
             (tag-instruction-erc [:integer :float :boolean :exec] 1000)
             (tagged-instruction-erc 1000)
