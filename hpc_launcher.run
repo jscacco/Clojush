@@ -1,4 +1,4 @@
-#PBS -N index-v1-stringdiff
+#PBS -N index-v1.0-rswn
 #PBS -l nodes=1:ppn=8
 #PBS -l mem=20GB
 #PBS -q una
@@ -7,7 +7,7 @@
 #PBS -j oe         
 #PBS -l walltime=72:00:00 
 #PBS -r y
-#PBS -o /home/thelmuth/Results/HPC-files/
+#PBS -o /usr/local/research/compsci/helmuth/jscacco/Results/HPC-files/
 #PBS -t 0-99
 # This last line is the range of the number of jobs to start, inclusive
 
@@ -18,12 +18,12 @@
 NP=`cat $PBS_NODEFILE | wc -l`  # Bash syntax
 #setenv NP `cat $PBS_NODEFILE | wc -l` # tcsh/csh syntax
 
-
-NAMESPACE="string-differences"
-NAMESPACE="collatz-numbers"
+NAMESPACE="replace-space-with-newline"
+#NAMESPACE="string-differences"
+#NAMESPACE="collatz-numbers"
 #NAMESPACE="last-index-of-zero"
 
-DIRECTORY="$PBS_O_HOME/Results/index-v1/$NAMESPACE"
+DIRECTORY="/usr/local/research/compsci/helmuth/jscacco/Results/index-v1.0/$NAMESPACE"
 
 PUSHARGS=":parent-selection :$SELECTION :print-instruction-frequencies"
 
