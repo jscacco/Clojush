@@ -23,9 +23,13 @@ NAMESPACE="replace-space-with-newline"
 #NAMESPACE="collatz-numbers"
 #NAMESPACE="last-index-of-zero"
 
+# Results will go to our shared results directory (helmuth). You may have a symlink to this directory called Collab.
+# Make sure the correct subdirectory follows helmuth -- the first subdirectory should be
+# your username (in my case, thelmuth).
+
 DIRECTORY="/usr/local/research/compsci/helmuth/jscacco/Results/index-v1.0/$NAMESPACE"
 
-PUSHARGS=":parent-selection :$SELECTION :print-instruction-frequencies"
+PUSHARGS=":print-timings true :print-instruction-frequencies true"
 
 PROBLEM="clojush.problems.software.$NAMESPACE"
 
@@ -47,6 +51,10 @@ echo ""
 
 echo "lein command: $LEINCMD"
 echo ""
+
+### Uncomment these to make results directories available to everyone
+# touch "$DIRECTORY/log$PBS_ARRAYID.txt"
+# chmod -R o+rx $DIRECTORY
 
 time $LEINCMD > "$DIRECTORY/log$PBS_ARRAYID.txt"
 
