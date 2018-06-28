@@ -24,7 +24,8 @@
   (fn [state]
     (assoc (push-item (assoc state :exec '())
                       :environment state)
-           :return '())))
+           :return '()))
+  )
 
 (define-registered
   environment_end
@@ -49,6 +50,7 @@
 (define-registered return_fromcode (with-meta (returner :code) {:stack-types [:environment :code]}))
 (define-registered return_frominteger (with-meta (returner :integer) {:stack-types [:environment :integer]}))
 (define-registered return_fromfloat (with-meta (returner :float) {:stack-types [:environment :float]}))
+(define-registered return_fromindex (with-meta (returner :index) {:stack-types [:environment :index]}))
 (define-registered return_fromboolean (with-meta (returner :boolean) {:stack-types [:environment :boolean]}))
 (define-registered return_fromzip (with-meta (returner :zip) {:stack-types [:environment :zip]}))
 (define-registered return_fromstring (with-meta (returner :string) {:stack-types [:environment :string]}))
