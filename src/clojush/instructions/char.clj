@@ -29,6 +29,16 @@
       state)))
 
 (define-registered
+  char_fromindex
+  ^{:stack-types [:char :index]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (let [item (stack-ref :index 0 state)]
+        (->> (pop-item :index state)
+             (push-item (char (mod item 128)) :char)))
+      state)))
+
+(define-registered
   char_fromfloat
   ^{:stack-types [:char :float]}
   (fn [state]

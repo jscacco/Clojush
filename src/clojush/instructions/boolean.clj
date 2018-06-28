@@ -90,3 +90,13 @@
                  :boolean
                  (pop-item :float state))
       state)))
+
+(define-registered
+  boolean_fromindex
+  ^{:stack-types [:boolean :index]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (push-item (not (zero? (stack-ref :index 0 state)))
+                 :boolean
+                 (pop-item :float state))
+      state)))

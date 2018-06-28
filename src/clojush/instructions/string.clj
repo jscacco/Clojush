@@ -28,6 +28,16 @@
       state)))
 
 (define-registered
+  string_fromindex
+  ^{:stack-types [:string :index]}
+  (fn [state]
+    (if (not (empty? (:index state)))
+      (let [item (stack-ref :index 0 state)]
+        (->> (pop-item :index state)
+             (push-item (str item) :string)))
+      state)))
+
+(define-registered
   string_fromboolean
   ^{:stack-types [:string :boolean]}
   (fn [state]
