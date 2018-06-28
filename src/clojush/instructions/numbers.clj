@@ -64,7 +64,7 @@
             second (stack-ref type 1 state)]
         (->> (pop-item type state)
              (pop-item type)
-             (push-item (if (= type :integer)
+             (push-item (if (or (= type :integer) (= type :index))
                           (truncate (keep-number-reasonable (/ second first)))
                           (keep-number-reasonable (/ second first)))
                         type)))
