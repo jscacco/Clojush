@@ -478,3 +478,85 @@
 (define-registered exec_do*vector_float (with-meta (iterateer :vector_float :float 'exec_do*vector_float) {:stack-types [:vector_float :float :exec] :parentheses 1}))
 (define-registered exec_do*vector_boolean (with-meta (iterateer :vector_boolean :boolean 'exec_do*vector_boolean) {:stack-types [:vector_boolean :boolean :exec] :parentheses 1}))
 (define-registered exec_do*vector_string (with-meta (iterateer :vector_string :string 'exec_do*vector_string) {:stack-types [:vector_string :string :exec] :parentheses 1}))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; instructions for mapping and the hof_result stack
+(defn map_driver
+  "Does the bulk of the work for map. In-type and out-type are strings"
+  [in-type out-type]
+  (fn [state]
+    (let [in-stack (keyword (str "vector_" in-type))
+          out-stack (keyword (str "vector_" out-type))]
+      ;; Check if the top vector for in-stack is empty. If so, stop.
+      ;; Move top of :hof_result to top of out-stack.
+      (if (empty? (stack-ref in-stack 0 state))
+        (let [result (stack-ref :hof_result 0 state)]
+          (->> state
+               (push-item result out-stack)
+               (pop-item :hof-result)))
+        ;; If it isn't empty, map the next value and store the result
+        ;; in the top of :hof-result.
+        (let [value (first (stack-ref in-stack 0 state))
+              block (stack-ref :exec 0 state)
+              rest-of-values (rest (stack-ref in-stack 0 state))]
+          (->> state
+               (pop-item in-stack)
+               (push-item rest-of-values in-stack)
+               (pop-item :exec)
+               (push-item
+                `(environment_new ~(symbol (str "hof_return_" out-type))
+                                  value block) :exec)
+               ~(symbol (str "hof_result_conj_" out-type))
+               ~(symbol (str "exec_map_helper_" in-type "_to_" out-type))
+               block))))))
+
+(defn mapper
+  "Places a new vector on top of :hof_result, then does map_driver."
+  [in-type out-type]
+  (fn [state]
+    (push-item [] :hof_result state)
+    (map_driver in-type out-type))
+  
+
+(define-registered exec_map_helper_integer_to_integer (with-meta (map_driver "integer" "integer") {stack-types [:integer :exec :hof_result :vector_integer]}))
+(define-registered exec_map_helper_integer_to_float (with-meta (map_driver "integer" "float") {stack-types [:integer :float :exec :hof_result :vector_integer :vector_float]}))
+(define-registered exec_map_helper_integer_to_boolean (with-meta (map_driver "integer" "boolean") {stack-types [:integer :boolean :exec :hof_result :vector_integer :vector_boolean]}))
+(define-registered exec_map_helper_integer_to_string (with-meta (map_driver "integer" "string") {stack-types [:integer :string :exec :hof_result :vector_integer :vector_string]}))
+
+(define-registered exec_map_helper_float_to_integer (with-meta (map_driver "float" "integer") {stack-types [:float :integer :exec :hof_result :vector_float :vector_integer]}))
+(define-registered exec_map_helper_float_to_float (with-meta (map_driver  "float" "float") {stack-types [:float :exec :hof_result :vector_float]}))
+(define-registered exec_map_helper_float_to_boolean (with-meta (map_driver "float" "boolean") {stack-types [:float :boolean :exec :hof_result :vector_float :vector_boolean]}))
+(define-registered exec_map_helper_float_to_string (with-meta (map_driver "float" "string") {stack-types [:float :string :exec :hof_result :vector_float :vector_string]}))
+
+(define-registered exec_map_helper_boolean_to_integer (with-meta (map_driver "boolean" "integer") {stack-types [:boolean :integer :exec :hof_result :vector_boolean :vector_integer]}))
+(define-registered exec_map_helper_boolean_to_float (with-meta (map_driver  "boolean" "float") {stack-types [:boolean :float :exec :hof_result :vector_boolean :vector_float]}))
+(define-registered exec_map_helper_boolean_to_boolean (with-meta (map_driver "boolean" "boolean") {stack-types [:boolean :exec :hof_result :vector_boolean]}))
+(define-registered exec_map_helper_boolean_to_string (with-meta (map_driver "boolean" "string") {stack-types [:boolean :string :exec :hof_result :vector_boolean :vector_string]}))
+
+(define-registered exec_map_helper_string_to_integer (with-meta (map_driver "string" "integer") {stack-types [:string :integer :exec :hof_result :vector_string :vector_integer]}))
+(define-registered exec_map_helper_string_to_float (with-meta (map_driver  "string" "float") {stack-types [:string :float :exec :hof_result :vector_string :vector_float]}))
+(define-registered exec_map_helper_string_to_boolean (with-meta (map_driver "string" "boolean") {stack-types [:string :boolean :exec :hof_result :vector_string :vector_boolean]}))
+(define-registered exec_map_helper_string_to_string (with-meta (map_driver "string" "string") {stack-types [:string :exec :hof_result :vector_string]}))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; end helper, begin normal
+  
+(define-registered exec_map_integer_to_integer (with-meta (mapper "integer" "integer") {stack-types [:integer :exec :hof_result :vector_integer]}))
+(define-registered exec_map_integer_to_float (with-meta (mapper "integer" "float") {stack-types [:integer :float :exec :hof_result :vector_integer :vector_float]}))
+(define-registered exec_map_integer_to_boolean (with-meta (mapper "integer" "boolean") {stack-types [:integer :boolean :exec :hof_result :vector_integer :vector_boolean]}))
+(define-registered exec_map_integer_to_string (with-meta (mapper "integer" "string") {stack-types [:integer :string :exec :hof_result :vector_integer :vector_string]}))
+
+(define-registered exec_map_float_to_integer (with-meta (mapper "float" "integer") {stack-types [:float :integer :exec :hof_result :vector_float :vector_integer]}))
+(define-registered exec_map_float_to_float (with-meta (mapper  "float" "float") {stack-types [:float :exec :hof_result :vector_float]}))
+(define-registered exec_map_float_to_boolean (with-meta (mapper "float" "boolean") {stack-types [:float :boolean :exec :hof_result :vector_float :vector_boolean]}))
+(define-registered exec_map_float_to_string (with-meta (mapper "float" "string") {stack-types [:float :string :exec :hof_result :vector_float :vector_string]}))
+
+(define-registered exec_map_boolean_to_integer (with-meta (mapper "boolean" "integer") {stack-types [:boolean :integer :exec :hof_result :vector_boolean :vector_integer]}))
+(define-registered exec_map_boolean_to_float (with-meta (mapper  "boolean" "float") {stack-types [:boolean :float :exec :hof_result :vector_boolean :vector_float]}))
+(define-registered exec_map_boolean_to_boolean (with-meta (mapper "boolean" "boolean") {stack-types [:boolean :exec :hof_result :vector_boolean]}))
+(define-registered exec_map_boolean_to_string (with-meta (mapper "boolean" "string") {stack-types [:boolean :string :exec :hof_result :vector_boolean :vector_string]}))
+
+(define-registered exec_map_string_to_integer (with-meta (mapper "string" "integer") {stack-types [:string :integer :exec :hof_result :vector_string :vector_integer]}))
+(define-registered exec_map_string_to_float (with-meta (mapper  "string" "float") {stack-types [:string :float :exec :hof_result :vector_string :vector_float]}))
+(define-registered exec_map_string_to_boolean (with-meta (mapper "string" "boolean") {stack-types [:string :boolean :exec :hof_result :vector_string :vector_boolean]}))
+(define-registered exec_map_string_to_string (with-meta (mapper "string" "string") {stack-types [:string :exec :hof_result :vector_string]}))
