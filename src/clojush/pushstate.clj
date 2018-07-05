@@ -109,13 +109,20 @@
                             :auxiliary (:auxiliary state))]
       (if (empty? old-return)
         new-state
-        (recur (rest old-return)
-               (if (:popper (first old-return))
-                 (pop-item (:type (first old-return))
-                           new-state)
-                 (push-item (:item (first old-return)) 
-                            (:type (first old-return)) 
-                            new-state)))))))
+        ;; If the top item on the return stack has been placed there by an HOF, get the
+        ;; top item from the stack it references and push that to the same stack on
+        ;; the new environment.
+        (if (:hof (first old-return))
+          (push-item (stack-ref (:type (first old-return)) 0 state)
+           (:type (first old-return))
+                    new-state)
+          (recur (rest old-return)
+                 (if (:popper (first old-return))
+                   (pop-item (:type (first old-return))
+                             new-state)
+                   (push-item (:item (first old-return)) 
+                              (:type (first old-return)) 
+                              new-state))))))))
 
 (defn registered-for-type
   "Returns a list of all registered instructions with the given type name as a prefix."
