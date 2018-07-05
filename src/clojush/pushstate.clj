@@ -113,7 +113,7 @@
         ;; top item from the stack it references and push that to the same stack on
         ;; the new environment.
         (if (:hof (first old-return))
-          (push-item (stack-ref (:type (first old-return)) 0 state)
+          (push-item (top-item (:type (first old-return)) state)
            (:type (first old-return))
                     new-state)
           (recur (rest old-return)
