@@ -43,8 +43,11 @@
   (fn [state]
     (if (empty? (type state))
       state
-      (let [item (top-item type state)]
-        (push-item {:type type :item item} :return (pop-item type state))))))
+      ;; If an HOF map is on top of the return stack, no-op
+      (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+        state
+        (let [item (top-item type state)]
+          (push-item {:type type :item item} :return (pop-item type state)))))))
 
 (define-registered return_fromexec (with-meta (returner :exec) {:stack-types [:environment :exec] :parentheses 1}))
 (define-registered return_fromcode (with-meta (returner :code) {:stack-types [:environment :code]}))
@@ -61,55 +64,73 @@
   return_exec_pop
   ^{:stack-types [:environment :exec]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :exec :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :exec :popper true}) (:return state))))))
 
 (define-registered
   return_code_pop
   ^{:stack-types [:environment :code]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :code :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :code :popper true}) (:return state))))))
 
 (define-registered
   return_integer_pop
   ^{:stack-types [:environment :integer]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :integer :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :integer :popper true}) (:return state))))))
 
 (define-registered
   return_float_pop
   ^{:stack-types [:environment :float]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :float :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :float :popper true}) (:return state))))))
 
 (define-registered
   return_boolean_pop
   ^{:stack-types [:environment :boolean]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :boolean :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :boolean :popper true}) (:return state))))))
 
 (define-registered
   return_zip_pop
   ^{:stack-types [:environment :zip]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :zip :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :zip :popper true}) (:return state))))))
 
 (define-registered
   return_string_pop
   ^{:stack-types [:environment :string]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :string :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :string :popper true}) (:return state))))))
 
 (define-registered
   return_char_pop
   ^{:stack-types [:environment :char]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :char :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :char :popper true}) (:return state))))))
 
 (define-registered
   return_genome_pop
   ^{:stack-types [:environment :genome]}
   (fn [state]
-    (assoc state :return (list-concat (list {:type :genome :popper true}) (:return state)))))
+    (if (and (not (empty? (:return state))) (:hof (top-item :return state)))
+      state
+      (assoc state :return (list-concat (list {:type :genome :popper true}) (:return state))))))
 
 ; Immediately copies the current tagspace to the environment on the top
 ; of the :environment stack.
