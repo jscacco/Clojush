@@ -620,4 +620,75 @@
 (define-registered hof_result_conj_char (with-meta (hof-result-conjer :char) {:stack-types [:hof_result :char]}))
 (define-registered hof_result_conj_boolean (with-meta (hof-result-conjer :boolean) {:stack-types [:hof_result :boolean]}))
 
-         
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Filter
+
+(defn filter-checker
+  "Checks if the top of the boolean stack is false. If so, remove the back of the result vector."
+  [in-type]
+  (fn [state]
+    ;; If the last value returned false, remove it from the result vector.
+    (if (= (top-item :boolean state) false)
+      (let [results (vec (butlast (top-item :hof_result state)))]
+        (->> state
+             (pop-item :hof_result)
+             (push-item results :hof_result)
+             (push-item (symbol (str "exec_filter_helper_" in-type)) :exec)))
+      (push-item (symbol (str "exec_filter_helper_" in-type)) :exec state))))
+    
+(defn filter-helper
+  "Does the bulk of the work for filter."
+  [in-type]
+  (fn [state]
+    (let [in-stack (if (= in-type "char") :string (keyword (str "vector_" in-type)))]
+      ;; Check if the top vector for in-stack is empty. If so, stop.
+      ;; Move top of :hof_result to top of in-stack.
+      (if (empty? (top-item in-stack state))
+        (let [result (top-item :hof_result state)]
+          (->> state
+               (pop-item in-stack)
+               (pop-item :exec)
+               (push-item result in-stack)
+               (pop-item :hof_result)))
+        ;; If it isn't empty, filter the next value and store it
+        ;; in the top of :hof-result.
+        (let [value (first (top-item in-stack state))
+              block (top-item :exec state)
+              rest-of-values (vec (rest (top-item in-stack state)))]
+          (->> state
+               (pop-item in-stack)
+               (push-item rest-of-values in-stack)
+               (pop-item :exec)
+               ;; Put the value in the result vector. We will remove it later if false is left on top of :boolean.
+               (push-item value (keyword in-type))
+               (push-item
+                (list (symbol (str "hof_result_conj_" in-type))
+                       'environment_new (list 'return_hof_boolean value block) 
+                       (symbol (str "exec_filter_checker_" in-type)) 
+                       block)
+                :exec)))))))
+
+(defn filterer
+  "Places a new vector on top of :hof_result, then does filter_driver."
+  [in-type]
+  (fn [state]
+    (push-item (symbol (str "exec_filter_helper_" in-type)) :exec
+               (push-item [] :hof_result state))))
+
+(define-registered exec_filter_integer (with-meta (filterer "integer") {:stack-types [:exec :vector_integer]}))
+(define-registered exec_filter_float (with-meta (filterer "float") {:stack-types [:exec :vector_float]}))
+(define-registered exec_filter_boolean (with-meta (filterer "boolean") {:stack-types [:exec :vector_boolean]}))
+(define-registered exec_filter_string (with-meta (filterer "string") {:stack-types [:exec :vector_string]}))
+(define-registered exec_filter_char (with-meta (filterer "char") {:stack-types [:exec :string]}))
+
+(define-registered exec_filter_checker_integer  (with-meta (filter-checker "integer") {:stack-types [:exec :boolean :vector_integer :hof_result]}))
+(define-registered exec_filter_checker_float  (with-meta (filter-checker "float") {:stack-types [:exec :boolean :vector_float :hof_result]}))
+(define-registered exec_filter_checker_boolean  (with-meta (filter-checker "boolean") {:stack-types [:exec :boolean :vector_boolean :hof_result]}))
+(define-registered exec_filter_checker_string  (with-meta (filter-checker "string") {:stack-types [:exec :boolean :vector_string :hof_result]}))
+(define-registered exec_filter_checker_char  (with-meta (filter-checker "char") {:stack-types [:exec :boolean :string :hof_result]}))
+
+(define-registered exec_filter_helper_integer (with-meta (filter-helper "integer") {:stack-types [:exec :vector_integer :hof_result]}))
+(define-registered exec_filter_helper_float (with-meta (filter-helper "float") {:stack-types [:exec :vector_float :hof_result]}))
+(define-registered exec_filter_helper_boolean (with-meta (filter-helper "boolean") {:stack-types [:exec :vector_boolean :hof_result]}))
+(define-registered exec_filter_helper_string (with-meta (filter-helper "string") {:stack-types [:exec :vector_string :hof_result]}))
+(define-registered exec_filter_helper_char (with-meta (filter-helper "char") {:stack-types [:exec :string :hof_result]}))
