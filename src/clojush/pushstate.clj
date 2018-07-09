@@ -110,12 +110,12 @@
       (if (empty? old-return)
         new-state
         ;; If the top item on the return stack has been placed there by an HOF, get the
-        ;; top item from the stack it references and push that to the same stack on
-        ;; the new environment.
-        (if (:hof (first old-return))
+        ;; top item from the stack it references (if there is something on that stack)
+        ;; and push that to the same stack on the new environment.
+        (if (and (:hof (first old-return) (not (empty? (:type (first old-return)) state))))
           (push-item (top-item (:type (first old-return)) state)
-           (:type (first old-return))
-                    new-state)
+                     (:type (first old-return))
+                     new-state)
           (recur (rest old-return)
                  (if (:popper (first old-return))
                    (pop-item (:type (first old-return))

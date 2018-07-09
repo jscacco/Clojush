@@ -487,31 +487,34 @@
   (fn [state]
     (let [in-stack (if (= in-type "char") :string (keyword (str "vector_" in-type)))
           out-stack (if (= out-type "char") :string (keyword (str "vector_" out-type)))]
-      ;; Check if the top vector for in-stack is empty. If so, stop.
-      ;; Move top of :hof_result to top of out-stack.
-      (if (empty? (top-item in-stack state))
-        (let [result (top-item :hof_result state)]
-          (->> state
-               (pop-item in-stack)
-               (pop-item :exec)
-               (push-item result out-stack)
-               (pop-item :hof_result)))
-        ;; If it isn't empty, map the next value and store the result
-        ;; in the top of :hof-result.
-        (let [value (first (top-item in-stack state))
-              block (top-item :exec state)
-              rest-of-values (vec (rest (top-item in-stack state)))]
-          (->> state
-               (pop-item in-stack)
-               (push-item rest-of-values in-stack)
-               (pop-item :exec)
-               (push-item
-                (list 'environment_new (list (symbol (str "return_hof_" out-type))
-                                  value block) 
-                      (symbol (str "hof_result_conj_" out-type)) 
-                      (symbol (str "exec_map_helper_" in-type "_to_" out-type)) 
-                      block)
-                :exec)))))))
+      ;; If there is nothing on the in-stack, no-op
+      (if (empty? (in-stack state))
+        (push-item [] in-stack state)
+        ;; Check if the top vector for in-stack is empty. If so, stop.
+        ;; Move top of :hof_result to top of out-stack.
+        (if (empty? (top-item in-stack state))
+          (let [result (top-item :hof_result state)]
+            (->> state
+                 (pop-item in-stack)
+                 (pop-item :exec)
+                 (push-item result out-stack)
+                 (pop-item :hof_result)))
+          ;; If it isn't empty, map the next value and store the result
+          ;; in the top of :hof-result.
+          (let [value (first (top-item in-stack state))
+                block (top-item :exec state)
+                rest-of-values (vec (rest (top-item in-stack state)))]
+            (->> state
+                 (pop-item in-stack)
+                 (push-item rest-of-values in-stack)
+                 (pop-item :exec)
+                 (push-item
+                  (list 'environment_new (list (symbol (str "return_hof_" out-type))
+                                               value block) 
+                        (symbol (str "hof_result_conj_" out-type)) 
+                        (symbol (str "exec_map_helper_" in-type "_to_" out-type)) 
+                        block)
+                  :exec))))))))
 
 (defn mapper
   "Places a new vector on top of :hof_result, then does map_driver."
@@ -641,32 +644,35 @@
   [in-type]
   (fn [state]
     (let [in-stack (if (= in-type "char") :string (keyword (str "vector_" in-type)))]
-      ;; Check if the top vector for in-stack is empty. If so, stop.
-      ;; Move top of :hof_result to top of in-stack.
-      (if (empty? (top-item in-stack state))
-        (let [result (top-item :hof_result state)]
-          (->> state
-               (pop-item in-stack)
-               (pop-item :exec)
-               (push-item result in-stack)
-               (pop-item :hof_result)))
-        ;; If it isn't empty, filter the next value and store it
-        ;; in the top of :hof-result.
-        (let [value (first (top-item in-stack state))
-              block (top-item :exec state)
-              rest-of-values (vec (rest (top-item in-stack state)))]
-          (->> state
-               (pop-item in-stack)
-               (push-item rest-of-values in-stack)
-               (pop-item :exec)
-               ;; Put the value in the result vector. We will remove it later if false is left on top of :boolean.
-               (push-item value (keyword in-type))
-               (push-item
-                (list (symbol (str "hof_result_conj_" in-type))
-                       'environment_new (list 'return_hof_boolean value block) 
-                       (symbol (str "exec_filter_checker_" in-type)) 
-                       block)
-                :exec)))))))
+      ;; If there is nothing on the in-stack, no-op
+      (if (empty? (in-stack state))
+        (push-item [] in-stack state)
+        ;; Check if the top vector for in-stack is empty. If so, stop.
+        ;; Move top of :hof_result to top of in-stack.
+        (if (empty? (top-item in-stack state))
+          (let [result (top-item :hof_result state)]
+            (->> state
+                 (pop-item in-stack)
+                 (pop-item :exec)
+                 (push-item result in-stack)
+                 (pop-item :hof_result)))
+          ;; If it isn't empty, filter the next value and store it
+          ;; in the top of :hof-result.
+          (let [value (first (top-item in-stack state))
+                block (top-item :exec state)
+                rest-of-values (vec (rest (top-item in-stack state)))]
+            (->> state
+                 (pop-item in-stack)
+                 (push-item rest-of-values in-stack)
+                 (pop-item :exec)
+                 ;; Put the value in the result vector. We will remove it later if false is left on top of :boolean.
+                 (push-item value (keyword in-type))
+                 (push-item
+                  (list (symbol (str "hof_result_conj_" in-type))
+                        'environment_new (list 'return_hof_boolean value block) 
+                        (symbol (str "exec_filter_checker_" in-type)) 
+                        block)
+                  :exec))))))))
 
 (defn filterer
   "Places a new vector on top of :hof_result, then does filter_driver."
