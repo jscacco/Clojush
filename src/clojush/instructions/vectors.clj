@@ -489,11 +489,15 @@
           out-stack (if (= out-type "char") :string (keyword (str "vector_" out-type)))]
       ;; If there is nothing on the in-stack, no-op
       (if (empty? (in-stack state))
-        (push-item [] in-stack state)
+        (if (= in-type "char")
+          (push-item "" out-stack state)
+          (push-item [] out-stack state))
         ;; Check if the top vector for in-stack is empty. If so, stop.
         ;; Move top of :hof_result to top of out-stack.
         (if (empty? (top-item in-stack state))
-          (let [result (top-item :hof_result state)]
+          (let [result (if (= out-type "char")
+                         (apply str (top-item :hof_result state))
+                         (top-item :hof_result state))]
             (->> state
                  (pop-item in-stack)
                  (pop-item :exec)
@@ -503,7 +507,9 @@
           ;; in the top of :hof-result.
           (let [value (first (top-item in-stack state))
                 block (top-item :exec state)
-                rest-of-values (vec (rest (top-item in-stack state)))]
+                rest-of-values (if (= in-type "char")
+                                 (apply str (rest (top-item in-stack state)))
+                                 (vec (rest (top-item in-stack state))))]
             (->> state
                  (pop-item in-stack)
                  (push-item rest-of-values in-stack)
@@ -583,11 +589,11 @@
 (define-registered exec_map_string_to_string (with-meta (mapper "string" "string") {:stack-types [:exec :vector_string]}))
 (define-registered exec_map_string_to_char (with-meta (mapper "string" "string") {:stack-types [:exec :vector_string :string]}))
 
-(define-registered exec_mapper_char_to_integer (with-meta (map_driver "char" "integer") {:stack-types [:exec :string :vector_integer]}))
-(define-registered exec_mapper_char_to_float (with-meta (map_driver  "char" "float") {:stack-types [:exec :string :vector_float]}))
-(define-registered exec_mapper_char_to_boolean (with-meta (map_driver "char" "boolean") {:stack-types [:exec :string :vector_boolean]}))
-(define-registered exec_mapper_char_to_string (with-meta (map_driver "char" "string") {:stack-types [:exec :string :vector_string]}))
-(define-registered exec_mapper_char_to_char (with-meta (map_driver "char" "char") {:stack-types [:exec :string]}))
+(define-registered exec_map_char_to_integer (with-meta (mapper "char" "integer") {:stack-types [:exec :string :vector_integer]}))
+(define-registered exec_map_char_to_float (with-meta (mapper  "char" "float") {:stack-types [:exec :string :vector_float]}))
+(define-registered exec_map_char_to_boolean (with-meta (mapper "char" "boolean") {:stack-types [:exec :string :vector_boolean]}))
+(define-registered exec_map_char_to_string (with-meta (mapper "char" "string") {:stack-types [:exec :string :vector_string]}))
+(define-registered exec_map_char_to_char (with-meta (mapper "char" "char") {:stack-types [:exec :string]}))
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hof_return_[TYPE] instructions which push to the return stack HOF maps.
@@ -613,9 +619,11 @@
   (fn [state]
     (let [values (top-item :hof_result state)
           item (top-item type state)]
-      (push-item (conj values item) :hof_result
-                 (pop-item :hof_result
-                           (pop-item type state))))))
+      (if (not= item :no-stack-item)
+        (push-item (conj values item) :hof_result
+                   (pop-item :hof_result
+                             (pop-item type state)))
+        state))))
 
 (define-registered hof_result_conj_integer (with-meta (hof-result-conjer :integer) {:stack-types [:hof_result :integer]}))
 (define-registered hof_result_conj_float (with-meta (hof-result-conjer :float) {:stack-types [:hof_result :float]}))
@@ -646,11 +654,15 @@
     (let [in-stack (if (= in-type "char") :string (keyword (str "vector_" in-type)))]
       ;; If there is nothing on the in-stack, no-op
       (if (empty? (in-stack state))
-        (push-item [] in-stack state)
+        (if (= in-type "char")
+          (push-item "" in-stack state)
+          (push-item [] in-stack state))
         ;; Check if the top vector for in-stack is empty. If so, stop.
         ;; Move top of :hof_result to top of in-stack.
         (if (empty? (top-item in-stack state))
-          (let [result (top-item :hof_result state)]
+          (let [result (if (= in-type "char")
+                         (apply str (top-item :hof_result state))
+                         (top-item :hof_result state))]
             (->> state
                  (pop-item in-stack)
                  (pop-item :exec)
