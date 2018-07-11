@@ -526,8 +526,11 @@
   "Places a new vector on top of :hof_result, then does map_driver."
   [in-type out-type]
   (fn [state]
-    (push-item (symbol (str "exec_map_helper_" in-type "_to_" out-type)) :exec
-               (push-item [] :hof_result state))))
+    (if (not (empty? (:exec state)))
+      (push-item (symbol (str "exec_map_helper_" in-type "_to_" out-type)) :exec
+                 (push-item [] :hof_result state))
+      state)))
+
 
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helper instructions for map
@@ -672,7 +675,10 @@
           ;; in the top of :hof-result.
           (let [value (first (top-item in-stack state))
                 block (top-item :exec state)
-                rest-of-values (vec (rest (top-item in-stack state)))]
+                rest-of-values
+                (if (= in-stack "char")
+                  (apply str (rest (top-item in-stack state)))
+                  (vec (rest (top-item in-stack state))))]
             (->> state
                  (pop-item in-stack)
                  (push-item rest-of-values in-stack)
@@ -690,8 +696,10 @@
   "Places a new vector on top of :hof_result, then does filter_driver."
   [in-type]
   (fn [state]
-    (push-item (symbol (str "exec_filter_helper_" in-type)) :exec
-               (push-item [] :hof_result state))))
+    (if (not (empty? (:exec state)))
+      (push-item (symbol (str "exec_filter_helper_" in-type)) :exec
+                 (push-item [] :hof_result state))
+      state)))
 
 (define-registered exec_filter_integer (with-meta (filterer "integer") {:stack-types [:exec :vector_integer]}))
 (define-registered exec_filter_float (with-meta (filterer "float") {:stack-types [:exec :vector_float]}))
