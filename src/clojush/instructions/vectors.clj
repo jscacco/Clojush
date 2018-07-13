@@ -490,8 +490,8 @@
       ;; If there is nothing on the in-stack, no-op
       (if (empty? (in-stack state))
         (if (= in-type "char")
-          (push-item "" out-stack state)
-          (push-item [] out-stack state))
+          (pop-item :hof_result (push-item "" out-stack state))
+          (pop-item :hof_result (push-item [] out-stack state)))
         ;; Check if the top vector for in-stack is empty. If so, stop.
         ;; Move top of :hof_result to top of out-stack.
         (if (empty? (top-item in-stack state))
@@ -658,8 +658,8 @@
       ;; If there is nothing on the in-stack, no-op
       (if (empty? (in-stack state))
         (if (= in-type "char")
-          (push-item "" in-stack state)
-          (push-item [] in-stack state))
+          (pop-item :hof_result (push-item "" in-stack state))
+          (pop-item :hof_result (push-item [] in-stack state)))
         ;; Check if the top vector for in-stack is empty. If so, stop.
         ;; Move top of :hof_result to top of in-stack.
         (if (empty? (top-item in-stack state))
