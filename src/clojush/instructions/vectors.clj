@@ -676,7 +676,7 @@
           (let [value (first (top-item in-stack state))
                 block (top-item :exec state)
                 rest-of-values
-                (if (= in-stack "char")
+                (if (= in-type "char")
                   (apply str (rest (top-item in-stack state)))
                   (vec (rest (top-item in-stack state))))]
             (->> state
