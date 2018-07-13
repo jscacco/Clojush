@@ -1,4 +1,4 @@
-#PBS -N index-v1.0-rswn
+#PBS -N hof-v1.0-rswn
 #PBS -l nodes=1:ppn=8
 #PBS -l mem=20GB
 #PBS -q una
@@ -27,7 +27,7 @@ NAMESPACE="replace-space-with-newline"
 # Make sure the correct subdirectory follows helmuth -- the first subdirectory should be
 # your username (in my case, thelmuth).
 
-DIRECTORY="/usr/local/research/compsci/helmuth/jscacco/Results/index-v1.0/$NAMESPACE"
+DIRECTORY="/usr/local/research/compsci/helmuth/jscacco/Results/hof-v1.0/$NAMESPACE"
 
 PUSHARGS=":print-timings true :print-instruction-frequencies true"
 
