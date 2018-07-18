@@ -262,6 +262,16 @@
 (define-registered code_fromindex (with-meta (codemaker :index) {:stack-types [:code :index]}))
 (define-registered code_quote (with-meta (codemaker :exec) {:stack-types [:code :exec] :parentheses 1}))
 
+(define-registered
+  exec_fromstring
+  ^{:stack-types [:exec :string :hof_result]}
+  (fn [state]
+    (if (not (empty? (:string state)))
+      (push-item (symbol (first (:string state)))
+                 :exec
+                 (pop-item :string state))
+      state)))
+
 (define-registered 
   code_if
   ^{:stack-types [:code :exec :boolean]}
@@ -534,3 +544,19 @@
           state))
       state)))
 
+(defn deepester
+  "Returns a function that takes a state and pushes the name of the stack with the most items
+  (from a vector of stack names to :string."
+  []
+  (fn [state]
+    (let
+        [names (if (not (empty? (:vector_string state)))
+                 (top-item :vector_string state)
+                 '("integer" "float" "index" "boolean" "string" "char" "exec" "code" "zip"))
+         stacks (map keyword names)
+         depths (map #(count (% state)) stacks)
+         index (first (apply max-key second (map-indexed vector (vec depths))))
+         stack (nth names index)]
+      (push-item (str stack) :string (pop-item :vector_string state)))))
+
+(define-registered exec_deepest (with-meta (deepester) {:stack-types [:exec :string]}))

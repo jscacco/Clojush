@@ -328,3 +328,5 @@
 (define-registered string_empty (with-meta (emptyer :string) {:stack-types [:string :boolean]}))
 (define-registered char_empty (with-meta (emptyer :char) {:stack-types [:char :boolean]}))
 
+  
+
