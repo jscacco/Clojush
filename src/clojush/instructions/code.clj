@@ -544,19 +544,4 @@
           state))
       state)))
 
-(defn deepester
-  "Returns a function that takes a state and pushes the name of the stack with the most items
-  (from a vector of stack names to :string."
-  []
-  (fn [state]
-    (let
-        [names (if (not (empty? (:vector_string state)))
-                 (top-item :vector_string state)
-                 '("integer" "float" "index" "boolean" "string" "char" "exec" "code" "zip"))
-         stacks (map keyword names)
-         depths (map #(count (% state)) stacks)
-         index (first (apply max-key second (map-indexed vector (vec depths))))
-         stack (nth names index)]
-      (push-item (str stack) :string (pop-item :vector_string state)))))
 
-(define-registered exec_deepest (with-meta (deepester) {:stack-types [:exec :string]}))

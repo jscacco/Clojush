@@ -526,20 +526,19 @@
   "Places a new vector on top of :hof_result, then does a slightly modified map_driver."
   [in-type]
   (fn [state]
-    (if (not (empty? (:exec state)))
-      (let [in-stack (if (= in-type "char") :string (keyword (str "vector_" in-type)))
-            value (first (top-item in-stack state))
-            block (top-item :exec state)]
-        (push-item (list 'environment_new (list value block
-                                                ["integer" "float" "boolean" "char" "string"] 'exec_deepest 'return_fromstring)
-                         (str "exec_map_helper_" in-type "_to_")
-                         'string_swap
-                         'string_concat
-                         'exec_fromstring
-                         )
-                   :exec
-                   (push-item [] :hof_result state)))
-      state)))
+    (let [in-stack (if (= in-type "char") :string (keyword (str "vector_" in-type)))]
+      (if (and (not (empty? (:exec state))) (not (empty? (in-stack state))))
+        (let [value (first (top-item in-stack state))
+              block (top-item :exec state)]
+          (push-item (list 'environment_new (list value block 'exec_deepest 'return_fromstring)
+                           (str "exec_map_helper_" in-type "_to_")
+                           'string_swap
+                           'string_concat
+                           'exec_fromstring
+                           )
+                     :exec
+                     (push-item [] :hof_result state)))
+        state))))
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; helper instructions for map
 
@@ -605,6 +604,23 @@
 ; (define-registered exec_map_char_to_boolean (with-meta (mapper "char" "boolean") {:stack-types [:exec :string :vector_boolean]}))
 ; (define-registered exec_map_char_to_string (with-meta (mapper "char" "string") {:stack-types [:exec :string :vector_string]}))
 (define-registered exec_map_char (with-meta (mapper "char") {:stack-types [:exec :string]}))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; exec_deepest, used in mapper
+(defn deepester
+  "Returns a function that takes a state and pushes the name of the stack with the most items
+  (from a vector of stack names to :string."
+  []
+  (fn [state]
+    (let
+        [names (vector "integer" "float" "boolean" "string" "char")
+         stacks (map keyword names)
+         depths (map #(count (% state)) stacks)
+         index (first (apply max-key second (map-indexed vector (vec depths))))
+         stack (nth names index)]
+      (push-item (str stack) :string (pop-item :vector_string state)))))
+
+(define-registered exec_deepest (with-meta (deepester) {:stack-types [:exec :string :hof_result]}))
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hof_return_[TYPE] instructions which push to the return stack HOF maps.
