@@ -530,12 +530,7 @@
       (if (and (not (empty? (:exec state))) (not (empty? (in-stack state))))
         (let [value (first (top-item in-stack state))
               block (top-item :exec state)]
-          (push-item (list 'environment_new (list value block 'exec_deepest 'return_fromstring)
-                           (str "exec_map_helper_" in-type "_to_")
-                           'string_swap
-                           'string_concat
-                           'exec_fromstring
-                           )
+          (push-item (list 'environment_new (list 'return_hof_mostchanged in-type value block))
                      :exec
                      (push-item [] :hof_result state)))
         state))))
@@ -636,6 +631,18 @@
 (define-registered return_hof_string (with-meta (return-hofer :string) {:stack-types [:return :hof_result]}))
 (define-registered return_hof_char (with-meta (return-hofer :char) {:stack-types [:return :hof_result]}))
 (define-registered return_hof_boolean (with-meta (return-hofer :boolean) {:stack-types [:return :hof_result]}))
+
+(defn get-depths
+  "Returns a list of maps containing the depths of each stack in the state."
+  [state]
+    (let [stacks '(:integer :float :boolean :char :string)
+          depth-map (map #(hash-map :type % :startdepth (count (% state))) stacks)]
+      depth-map))
+
+(define-registered return_hof_mostchanged
+  ^{:stack-types [:return :hof_result]}
+  (fn [state]
+    (push-item {:hof true :type "mostchanged" :in-type (top-item :exec state) :depths (get-depths state)} :return (pop-item :exec state))))
 
  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; hof_result_conj_[TYPE] instructions which push the top of specified stack to result vector.
