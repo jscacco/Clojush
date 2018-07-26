@@ -115,24 +115,25 @@
         (if (:hof (first old-return))
           (if (= (:type (first old-return)) "mostchanged")
             (let
-                [depths (:depths old-return)
+                [depths (:depths (first old-return))
                  with-new-depths (map #(assoc :enddepth (count ((:type %) state))) depths)
                  with-depth-diff (map #(assoc :depthdiff (Math/abs (- (:startdepth %) (:enddepth %))) with-new-depths))
                  stack (apply str (rest (str (:type (last (sort-by :depthdiff with-depth-diff))))))]
-                 (push-item (symbol (str "exec_map_helper_" (:in-type (first old-return)) "_to_" stack))
-                         :exec new-state))
-            (if (empty? ((:type (first old-return)) state))
-              new-state
-              (push-item (top-item (:type (first old-return)) state)
-                         (:type (first old-return))
-                         new-state)))
-            (recur (rest old-return)
-                   (if (:popper (first old-return))
-                     (pop-item (:type (first old-return))
-                               new-state)
-                     (push-item (:item (first old-return)) 
-                                (:type (first old-return)) 
-                                new-state))))))))
+              ]
+            (push-item (symbol (str "exec_map_helper_" (:in-type (first old-return)) "_to_" stack))
+                       :exec new-state))
+          (if (empty? ((:type (first old-return)) state))
+            new-state
+            (push-item (top-item (:type (first old-return)) state)
+                       (:type (first old-return))
+                       new-state)))
+        (recur (rest old-return)
+               (if (:popper (first old-return))
+                 (pop-item (:type (first old-return))
+                           new-state)
+                 (push-item (:item (first old-return)) 
+                            (:type (first old-return)) 
+                            new-state)))))))
 
 (defn registered-for-type
   "Returns a list of all registered instructions with the given type name as a prefix."
