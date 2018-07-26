@@ -141,7 +141,7 @@
     (if include-randoms
       for-type
       (filter #(not (.endsWith (name %) "_rand")) for-type))))
-qq
+
 (defn registered-nonrandom
   "Returns a list of all registered instructions aside from random instructions."
   []
