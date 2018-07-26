@@ -635,7 +635,7 @@
 (defn get-depths
   "Returns a list of maps containing the depths of each stack in the state."
   [state]
-    (let [stacks '(:integer :float :boolean :char :string)
+    (let [stacks '(:float :boolean :string :char :integer)
           depth-map (map #(hash-map :type % :startdepth (count (% state))) stacks)]
       depth-map))
 
